@@ -5,12 +5,12 @@ pipeline {
         DOCKER_IMAGE = 'my-python-project:latest'
     }
 
-    stages {
-        stage('Checkout') {
-            steps {
-                git branch: 'main', url: 'https://github.com/your-username/my_python_project.git'
-            }
-        }
+    stage('Checkout') {
+        steps {
+            git branch: 'main', url: 'git@github.com:PratikKr10/my_python_project.git'
+    }
+}
+
 
         stage('Build Wheel') {
             steps {
