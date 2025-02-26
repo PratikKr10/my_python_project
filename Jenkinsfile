@@ -5,12 +5,12 @@ pipeline {
         DOCKER_IMAGE = 'my-python-project:latest'
     }
 
-    stage('Checkout') {
-        steps {
-            git branch: 'main', url: 'git@github.com:PratikKr10/my_python_project.git'
-    }
-}
-
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'main', url: 'git@github.com:PratikKr10/my_python_project.git'
+            }
+        }
 
         stage('Build Wheel') {
             steps {
@@ -28,7 +28,7 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t  .'
+                sh 'docker build -t ${DOCKER_IMAGE} .'
             }
         }
 
@@ -36,7 +36,7 @@ pipeline {
             steps {
                 sh 'docker stop my-python-container || true'
                 sh 'docker rm my-python-container || true'
-                sh 'docker run -d --name my-python-container '
+                sh 'docker run -d --name my-python-container ${DOCKER_IMAGE}'
             }
         }
     }
