@@ -3,6 +3,7 @@ pipeline {
 
     environment {
         DOCKER_IMAGE = 'my-python-project:latest'
+        VENV_PATH = "${WORKSPACE}/venv"  // Define virtual environment path
     }
 
     stages {
@@ -12,17 +13,33 @@ pipeline {
             }
         }
 
+        stage('Setup Python Environment') {
+            steps {
+                sh '''
+                python3 -m venv ${VENV_PATH}
+                source ${VENV_PATH}/bin/activate
+                pip install --upgrade pip
+                '''
+            }
+        }
+
         stage('Build Wheel') {
             steps {
-                sh 'pip install build'
-                sh 'python -m build --wheel'
+                sh '''
+                source ${VENV_PATH}/bin/activate
+                pip install build
+                python -m build --wheel
+                '''
             }
         }
 
         stage('Test') {
             steps {
-                sh 'pip install pytest'
-                sh 'pytest tests/'
+                sh '''
+                source ${VENV_PATH}/bin/activate
+                pip install pytest
+                pytest tests/
+                '''
             }
         }
 
@@ -34,9 +51,11 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                sh 'docker stop my-python-container || true'
-                sh 'docker rm my-python-container || true'
-                sh 'docker run -d --name my-python-container ${DOCKER_IMAGE}'
+                sh '''
+                docker stop my-python-container || true
+                docker rm my-python-container || true
+                docker run -d --name my-python-container ${DOCKER_IMAGE}
+                '''
             }
         }
     }
