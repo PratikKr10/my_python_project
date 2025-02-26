@@ -13,15 +13,16 @@ pipeline {
             }
         }
 
-        stage('Setup Python Environment') {
-            steps {
-                sh '''
-                python3 -m venv ${VENV_PATH}
-                source ${VENV_PATH}/bin/activate
-                pip install --upgrade pip
-                '''
-            }
+    stage('Setup Python Environment') {
+        steps {
+            sh '''
+            python3 -m venv "$VENV_PATH"
+            . "$VENV_PATH/bin/activate"  # Use . instead of source
+            pip install --upgrade pip build
+            '''
         }
+    }
+
 
         stage('Build Wheel') {
             steps {
