@@ -27,7 +27,7 @@ pipeline {
         stage('Build Wheel') {
             steps {
                 sh '''
-                source ${VENV_PATH}/bin/activate
+                . ${VENV_PATH}/bin/activate
                 pip install build
                 python -m build --wheel
                 '''
