@@ -51,11 +51,13 @@ pipeline {
                 dir('my_python_project') {
                     sh '''
                     . "$VENV_PATH/bin/activate"
+                    export PYTHONPATH=$PYTHONPATH:$(pwd)/src  # Add src/ to PYTHONPATH
                     pytest tests/
                     '''
                 }
             }
         }
+
 
         stage('Build Docker Image') {
             steps {
