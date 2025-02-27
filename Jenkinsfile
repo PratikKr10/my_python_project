@@ -6,6 +6,7 @@ pipeline {
         WORKDIR = "${WORKSPACE}/my_python_project"
         VENV_PATH = "${WORKSPACE}/venv"
         DOCKER_IMAGE = "my-python-app:latest"
+        CONTAINER_NAME = "my-python-container"
     }
 
     stages {
@@ -51,13 +52,12 @@ pipeline {
                 dir('my_python_project') {
                     sh '''
                     . "$VENV_PATH/bin/activate"
-                    export PYTHONPATH=$PYTHONPATH:$(pwd)/src  # Add src/ to PYTHONPATH
+                    export PYTHONPATH=$PYTHONPATH:$(pwd)/src
                     pytest tests/
                     '''
                 }
             }
         }
-
 
         stage('Build Docker Image') {
             steps {
@@ -72,9 +72,18 @@ pipeline {
         stage('Deploy') {
             steps {
                 sh '''
-                docker stop my-python-container || true
-                docker rm my-python-container || true
-                docker run -d --name my-python-container $DOCKER_IMAGE
+                docker stop $CONTAINER_NAME || true
+                docker rm $CONTAINER_NAME || true
+                docker run -d --name $CONTAINER_NAME $DOCKER_IMAGE
+                '''
+            }
+        }
+
+        stage('Show Docker Logs') {
+            steps {
+                sh '''
+                echo "Fetching logs from container..."
+                docker logs $CONTAINER_NAME
                 '''
             }
         }
